@@ -1,0 +1,14 @@
+{
+    "name": "ekg",
+    "type": "module",
+    "scripts": {
+        "dev": "node dev/dev"
+    },
+    "private": true,
+    "devDependencies": {
+        "fs-readdir-recursive": "^1.1.0",
+        "globcat": "^2.0.1",
+        "sass": "^1.49.9",
+        "typescript": "^4.6.2"
+    }
+}
