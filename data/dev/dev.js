@@ -152,7 +152,7 @@ const build_js = async () => {
     const comp = []
     const add = p => comp.push(resolve('../js_build/src', p))
 
-    const app_data = fs.readFileSync(resolve('../src/app.ts'), { encoding: 'utf8', flag: 'r' })
+    const app_data = fs.readFileSync(resolve('../app.ts'), { encoding: 'utf8', flag: 'r' })
 
     const include_list = remove_duplicates(
         split_by_newline(app_data)
@@ -202,7 +202,7 @@ await build()
 
 log(36, 'i watch:', `start watching: css, js`)
 watch(resolve('../'), name => /\.s[ac]ss$/i.test(name), async () => build_css())
-watch(resolve('../src'), name => /\.ts$/i.test(name), async () => {
+watch(resolve('../'), name => /\.ts$/i.test(name), async () => {
     compile_ts()
     await build_js()
 })
