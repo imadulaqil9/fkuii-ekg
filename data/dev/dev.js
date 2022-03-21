@@ -150,7 +150,6 @@ const build_js = async () => {
     clean_js()
 
     const comp = []
-    const add = p => comp.push(resolve('../js_build/src', p))
 
     const app_data = fs.readFileSync(resolve('../app.ts'), { encoding: 'utf8', flag: 'r' })
 
@@ -163,9 +162,11 @@ const build_js = async () => {
     let merge_count = 0
     log(36, 'i js:', 'merging...')
     for (let i = 0; i < include_list.length; i++) {
-        const p = include_list[i]
-        merge_count++
-        add(p)
+        const p = resolve('../js_build/src', include_list[i])
+        if (fs.existsSync(p)) {
+            merge_count++
+            comp.push(p)
+        }
     }
     log(36, 'i js:', `merged ${merge_count} file${plural(merge_count)}`)
 
