@@ -115,7 +115,7 @@ const compile_ts = () => {
             if (diag.file) {
                 const { line, character } = ts.getLineAndCharacterOfPosition(diag.file, diag.start)
                 const message = ts.flattenDiagnosticMessageText(diag.messageText, '\n')
-                console.log(`${diag.file.fileName} (${line + 1},${character + 1}): ${message}`)
+                log(31, '! ts:', `${path.relative(resolve('../src/'), diag.file.fileName)} (${line + 1}, ${character + 1}): ${message}`)
             }
             else {
                 console.log(ts.flattenDiagnosticMessageText(diag.messageText, '\n'))
@@ -134,14 +134,40 @@ const clean_js = (fullclean = false) => {
     })
 }
 
+const plural = n => n === 1 ? '' : 's'
+const replace_all = (n, a, b) => {
+    let result = ''
+    for (let i = 0; i < n.length; i++) {
+        if (n[i] === a) result += b
+        else result += n[i]
+    }
+    return result
+}
+const split_by_newline = str => str.split(/\r?\n/)
+const remove_duplicates = arr => [...new Set(arr)]
+
 const build_js = async () => {
     clean_js()
 
     const comp = []
     const add = p => comp.push(resolve('../js_build/src', p))
 
-    add('core/math.js')
-    add('base/game_manager.js')
+    const app_data = fs.readFileSync(resolve('../src/app.ts'), { encoding: 'utf8', flag: 'r' })
+
+    const include_list = remove_duplicates(
+        split_by_newline(app_data)
+            .filter(n => n)
+            .filter(n => !n.includes('//'))
+            .map(n => replace_all(n, `'`, '')))
+
+    let merge_count = 0
+    log(36, 'i js:', 'merging...')
+    for (let i = 0; i < include_list.length; i++) {
+        const p = include_list[i]
+        merge_count++
+        add(p)
+    }
+    log(36, 'i js:', `merged ${merge_count} file${plural(merge_count)}`)
 
     const stream = await globcat(comp, { stream: true })
     const result = await stream_to_string(stream)
